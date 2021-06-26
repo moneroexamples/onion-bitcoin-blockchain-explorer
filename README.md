@@ -5,16 +5,17 @@ in Python +3.7 with `Quart` and `aiohttp`.
 
 ### Testnet btc node
 
-Install Bitcoin Core and run `bitcoind` in testnet mode:
+Install Bitcoin Core and run `bitcoind` in the testnet mode with some rpcuser and rpcpassword
+which are set here as `bitcoinrpc` and `secretpassword222` as examples:
 
 ```bash
-bitcoind -server -testnet -txindex=0 -prune=0  -rpcuser=bitcoinrpc -rpcpassword=ahything
+bitcoind -server -testnet -txindex=0 -prune=0 -rpcuser=bitcoinrpc -rpcpassword=secretpassword222
 ```
 
 Setup `.cookie` for Bitcoin node RPC:
 
 ```bash
-echo -n "bitcoinrpc:ahything" > ~/bitcoin/.cookie
+echo -n "bitcoinrpc:secretpassword222" > ~/bitcoin/testnet3/.cookie
 ```
 
 If you change the above `username:password`, please edit `config.py` 
@@ -40,11 +41,16 @@ Once built, run with:
 ./target/release/electrs -vvv --network testnet --timestamp --http-addr "127.0.0.1:3000"
 ```
 
-### Bitcoin onion explorer
+### Onion Bitcoin blockchain explorer
 
 ```
-git clone .....
-cd ...
+git clone https://github.com/moneroexamples/onion-bitcoin-blockchain-explorer.git
+cd onion-bitcoin-blockchain-explorer
+
+python -m venv venv
+source ./venv/bin/activate
+
+pip3 install pip --upgrade
 
 pip install -r requirements.txt
 ```
@@ -53,8 +59,18 @@ Run it for development with:
 ```
 env QUART_APP=app quart run
 ```
-or for production with
+or for production with:
 
 ```
 hypercorn app
 ```
+
+## Other monero examples
+
+Other examples can be found on  [github](https://github.com/moneroexamples?tab=repositories).
+Please know that some of the examples/repositories are not
+finished and may not work as intended.
+
+## How can you help?
+
+Constructive criticism, code and website edits are always good. They can be made through Github.
