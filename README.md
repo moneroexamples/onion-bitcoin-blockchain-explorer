@@ -1,8 +1,12 @@
-## Bitcoin Onion Explorer
+## Bitcoin Onion Explorer 
 
 The explorer is implemented as an `asyncio` application 
 in Python +3.7 with `Quart` and `aiohttp`.
 
+### TO DO
+
+Still lots of things to do, as this is the **very early stage** of the development. But 
+issues, comments and testing is already being welcomed. 
 
 ### Testnet btc node
 
