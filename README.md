@@ -3,6 +3,7 @@
 The explorer is implemented as an `asyncio` application 
 in Python +3.7 with `Quart` and `aiohttp`.
 
+
 ### Testnet btc node
 
 Install Bitcoin Core and run `bitcoind` in the testnet mode with some rpcuser and rpcpassword
@@ -47,6 +48,7 @@ Once built, run with:
 git clone https://github.com/moneroexamples/onion-bitcoin-blockchain-explorer.git
 cd onion-bitcoin-blockchain-explorer
 
+sudo apt install python3-pip python3-venv 
 python -m venv venv
 source ./venv/bin/activate
 
