@@ -4,16 +4,16 @@
     {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <title>{% block title %}{% endblock %} - Bitcoin Onion Explorer</title>
+    <title>{% block title %}{% endblock %} - Onion Bitcoin Explorer</title>
     {% endblock %}
 </head>
 <body>
-    <h1><a href="/">Bitcoin Onion Explorer</a></h1>
+    <h1><a href="/">Onion Bitcoin Explorer</a></h1>
     <h4>(no javascript - no cookies - no web analytics trackers - no images - open sourced)</h4>
     <div id="content" class="center">{% block content %}{% endblock %}</div>
     <div id="footer" class="center">
     <h6 style="margin-top:10px">
-        <a href="https://github.com/moneroexamples/onion-monero-blockchain-explorer">source code</a>
+        <a href="https://github.com/moneroexamples/onion-bitcoin-blockchain-explorer">source code</a>
     </h6>
     </div>
 </body>

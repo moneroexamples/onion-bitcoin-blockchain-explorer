@@ -3,11 +3,27 @@
 
 {% block content %}
 
- <h3>Block info</h3>
+<H4>Block hash (height): {{block['id']}} ({{block['height']}})</H4>
  <div class="center">
      {{block}}
  </div>
-
+    <table class="center">
+        <tr>
+            <td>Timestamp [UCT] (epoch):</td><td>{{block['timestamp']}} ({{block['timestamp']}})</td>
+            <td>Age {{age_format}}:</td><td>{{block['timestamp'] | timedelta}}</td>
+            <td>Δ [h:m:s]:</td><td>{{delta_time}}</td>
+        </tr>
+        <tr>
+            <td>Version:</td><td>block['version']</td>
+            <td>Block reward:</td><td>{{blk_reward}}</td>
+            <td>Block size [kB]:</td><td>{{block['size']}}</td>
+        </tr>
+        <tr>
+            <td>nonce:</td><td>{{block['nonce']}}</td>
+            <td>Total fees:</td><td>{{sum_fees}}</td>
+            <td>No of txs:</td><td>{{block['tx_count']}}</td>
+        </tr>
+    </table>
 
 {% endblock %}
 

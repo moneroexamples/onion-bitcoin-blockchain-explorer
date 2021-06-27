@@ -7,6 +7,8 @@ from datetime import datetime
 from quart import Quart, render_template
 from .fetch_blockchain_data import BlockchainFetch
 
+
+
 app = Quart(__name__)
 app.jinja_options = {}
 
@@ -27,11 +29,17 @@ BLOCKS_ON_INDEX = app.config['BLOCKS_ON_INDEX']
 
 @app.route('/')
 async def index():
+
     async with BlockchainFetch() as fetch:
-        recent_blocks = await fetch.recent_blocks(BLOCKS_ON_INDEX)
+
+        recent_blocks_future = asyncio.create_task(
+            fetch.recent_blocks(BLOCKS_ON_INDEX))
+
         btc_chain_status = await fetch.blockchain_info()
         fee_estimate = await fetch.fee_estimate()
         mempool = await fetch.mempool()
+
+        recent_blocks = await recent_blocks_future
 
     return await render_template(
         "index.html",
@@ -43,8 +51,6 @@ async def index():
 
 @app.route('/block/<block_id>')
 async def block(block_id):
-
-    print(block_id)
 
     async with BlockchainFetch() as fetch:
 
@@ -82,3 +88,10 @@ def timedelta(timestamp):
         hours_count = delta.seconds // 3600
         left_minutes = (delta.seconds % 3600) / 60
         return f"{hours_count:02.0f}:{left_minutes:02.0f}"
+
+
+import werkzeug.exceptions
+
+@app.errorhandler(werkzeug.exceptions.NotFound)
+async def handle_not_found(e):
+    return await render_template("error.html"), 404
