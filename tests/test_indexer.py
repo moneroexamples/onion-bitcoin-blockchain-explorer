@@ -18,6 +18,13 @@ async def test_nonexisting(testclient):
 
 @pytest.mark.asyncio
 async def test_getblock(testclient):
+
+    # existing block
     response = await testclient.get('/block/111111')
+    assert response.status_code == 200
+
+    # non-existing  block
+    response = await testclient.get('/block/44444444111111')
+    assert "Wrong block_id" in (await response.data).decode()
     assert response.status_code == 200
 

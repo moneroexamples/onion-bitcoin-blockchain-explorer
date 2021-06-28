@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import aiohttp
 
@@ -24,7 +25,11 @@ class BlockchainFetch:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            logging.error(str(exc_val))
+
         await self.session.close()
+        return True
 
     async def _get(self, url):
         return await self.session.get(
@@ -86,6 +91,9 @@ class BlockchainFetch:
 
     async def block_by_height(self, block_height):
         return await(await self._get(f'/block-height/{block_height}')).text()
+
+    async def all_block_txs(self, block_id):
+        return await self._get(f'/block/{block_id}/txids')
 
 
 

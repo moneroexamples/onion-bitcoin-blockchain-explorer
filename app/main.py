@@ -30,6 +30,8 @@ BLOCKS_ON_INDEX = app.config['BLOCKS_ON_INDEX']
 @app.route('/')
 async def index():
 
+    recent_blocks = []
+
     async with BlockchainFetch() as fetch:
 
         recent_blocks_future = asyncio.create_task(
@@ -40,6 +42,10 @@ async def index():
         mempool = await fetch.mempool()
 
         recent_blocks = await recent_blocks_future
+
+    if not recent_blocks:
+        return await render_template(
+            "error.html")
 
     return await render_template(
         "index.html",
@@ -58,8 +64,10 @@ async def block(block_id):
             a_block = await fetch.block_by_id(block_id)
         else:
             if not isint(block_id):
-                app.logger.warning(f'Wrong block_id: {block_id}')
-                return await render_template("error.html")
+                app.logger.warning(f"Wrong block_id: {block_id}")
+                return await render_template(
+                    "error.html",
+                    msg=f"Wrong block_id: {block_id}")
 
             current_height = await fetch.current_height()
             searched_height = int(block_id)
@@ -67,14 +75,18 @@ async def block(block_id):
             if (searched_height > current_height
                     or searched_height < 0):
                 app.logger.warning(f'Wrong block_id: {block_id}')
-                return await render_template("error.html")
+                return await render_template(
+                    "error.html",
+                    msg=f"Wrong block_id: {block_id}")
 
             block_id = await fetch.block_by_height(searched_height)
             a_block = await fetch.block_by_id(block_id)
+            block_txs = await fetch.all_block_txs(block_id)
 
     return await render_template(
         "block.html",
-        block=await a_block.json())
+        block=await a_block.json(),
+        txs=await block_txs.json())
 
 
 @app.template_filter()

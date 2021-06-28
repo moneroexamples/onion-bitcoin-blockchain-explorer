@@ -2,8 +2,12 @@
 {% block title %}error{% endblock %}
 
 {% block content %}
+{% if msg is defined %}
+    Error: {{ msg }}
+{% else %}
+     <h3>Error: Something went really wrong :-(</h3>
+{% endif %}
 
- <h3>Error: Something went really wrong :-(</h3>
 
 {% endblock %}
 
