@@ -81,7 +81,8 @@ async def block(block_id):
 
             block_id = await fetch.block_by_height(searched_height)
             a_block = await fetch.block_by_id(block_id)
-            block_txs = await fetch.all_block_txs(block_id)
+
+        block_txs = await fetch.all_block_txs(block_id)
 
     return await render_template(
         "block.html",
