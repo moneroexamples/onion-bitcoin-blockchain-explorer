@@ -92,10 +92,22 @@ class BlockchainFetch:
     async def block_by_height(self, block_height):
         return await(await self._get(f'/block-height/{block_height}')).text()
 
-    async def all_block_txs(self, block_id):
+    async def all_block_txs_ids(self, block_id):
         return await self._get(f'/block/{block_id}/txids')
 
+    async def tx_outspends(self, tx_id):
+        return await self._get(f'/tx/{tx_id}/outspends')
 
+    async def block_txs(self, block_id):
 
+        block_txs_ids = await(await self.all_block_txs_ids(block_id)).json()
+
+        block_txs = []
+
+        for tx_id in block_txs_ids:
+            tx_outspends = await self.tx_outspends(tx_id)
+            block_txs.append(await tx_outspends.json())
+
+        return block_txs
 
 

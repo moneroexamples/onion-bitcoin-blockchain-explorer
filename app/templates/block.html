@@ -25,8 +25,12 @@
         </tr>
     </table>
 
+<h3>Block transactions</h3>
+
 <div>
-    {{txs}}
+    {% for tx in txs %}
+        <div>{{ loop.index }}: {{tx}}</div><br/>
+    {% endfor %}
 </div>
 
 {% endblock %}
