@@ -5,7 +5,7 @@
 
 <H4>Block hash (height): {{block['id']}} ({{block['height']}})</H4>
  <div class="center">
-     {{block}}
+    <!--{{block}}-->
  </div>
     <table class="center">
         <tr>
@@ -16,7 +16,7 @@
         <tr>
             <td>Version:</td><td>block['version']</td>
             <td>Block reward:</td><td>{{blk_reward}}</td>
-            <td>Block size [kB]:</td><td>{{block['size']}}</td>
+            <td>Block size [kB]:</td><td>{{(block['size'] / 1024) | round(2)}}</td>
         </tr>
         <tr>
             <td>nonce:</td><td>{{block['nonce']}}</td>
@@ -28,9 +28,31 @@
 <h3>Block transactions</h3>
 
 <div>
-    {% for tx in txs %}
-        <div>{{ loop.index }}: {{tx}}</div><br/>
-    {% endfor %}
+    <table class="center" style="width:80%">
+            <tbody>
+            <tr>
+                <td>No.</td>
+                <td>tx hash</td>
+                <td>fee [mBTC]</td>
+                <td>value [BTC]</td>
+                <td>size [byte]</td>
+                <td>weight</td>
+                <td>coinbase</td>
+            </tr>
+            {% for tx in txs %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="/tx/{{tx['txid']}}">{{tx['txid']}}</a></td>
+                <td>{{ (tx['fee'] / 1e5) | round(7)}}</td>
+                <td>{{ (tx['total_value'] / 1e8) | round(7)}}</td>
+                <td>{{ tx['size'] }}</td>
+                <td>{{ tx['weight'] }}</td>
+                <td>{{ tx['vin'][0]['is_coinbase'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 </div>
 
 {% endblock %}

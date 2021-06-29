@@ -3,8 +3,9 @@ import asyncio
 from .utils import isint
 
 from datetime import datetime
-
+from time import time
 from quart import Quart, render_template
+
 from .fetch_blockchain_data import BlockchainFetch
 
 
@@ -88,6 +89,29 @@ async def block(block_id):
         "block.html",
         block=await a_block.json(),
         txs=block_txs)
+
+@app.route('/tx/<tx_id>')
+async def tx(tx_id):
+
+    async with BlockchainFetch() as fetch:
+
+        if len(tx_id) != 64:
+            return await render_template(
+                "error.html",
+                msg=f"Wrong tx_id: {tx_id}")
+
+        tx_status = await fetch.tx_status(tx_id)
+
+    tx_status_text = await tx_status.text()
+
+    if "Transaction not found" in tx_status_text:
+        return await render_template(
+            "error.html",
+            msg=f"Transaction {tx_id} not found")
+
+    return await render_template(
+        "transaction.html",
+        tx=await tx_status.json())
 
 
 @app.template_filter()

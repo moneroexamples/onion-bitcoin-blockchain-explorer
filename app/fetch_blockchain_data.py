@@ -3,6 +3,8 @@ import logging
 
 import aiohttp
 
+
+
 class BlockchainFetch:
 
     indexer_protocol = 'http'
@@ -98,15 +100,28 @@ class BlockchainFetch:
     async def tx_outspends(self, tx_id):
         return await self._get(f'/tx/{tx_id}/outspends')
 
+    async def tx_status(self, tx_id):
+        return await self._get(f'/tx/{tx_id}')
+
     async def block_txs(self, block_id):
 
-        block_txs_ids = await(await self.all_block_txs_ids(block_id)).json()
+        block_txs_ids = await(
+            await self.all_block_txs_ids(block_id)).json()
 
-        block_txs = []
+        results = await asyncio.gather(
+            *[self.tx_status(tx_id) for tx_id in block_txs_ids]
+        )
 
-        for tx_id in block_txs_ids:
-            tx_outspends = await self.tx_outspends(tx_id)
-            block_txs.append(await tx_outspends.json())
+        block_txs = await asyncio.gather(
+            *[result.json() for result in results]
+        )
+
+        # add total transfer value
+        for tx in block_txs:
+            vin_total = sum([vi.get("value", 0) for vi in tx.get("vin", [])])
+            vout_total = sum([vo.get("value", 0) for vo in tx.get("vout", [])])
+            #print(tx['txid'], vin_total, vout_total, [vi.get("vout", 0) for vi in tx.get("vin", [])])
+            tx["total_value"] = vout_total - vin_total
 
         return block_txs
 

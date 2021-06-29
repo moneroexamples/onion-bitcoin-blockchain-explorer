@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Transaction{% endblock %}
+
+{% block content %}
+
+<H4>Tx hash (height): {{tx['txid']}} ({{tx['status']['block_height']}})</H4>
+
+ <div class="center">
+    {{tx}}
+ </div>
+
+</div>
+
+{% endblock %}
+
+
