@@ -38,8 +38,9 @@
                 <td>size [byte]</td>
                 <td>weight</td>
                 <td>coinbase</td>
+                <td>segwit</td>
             </tr>
-            {% for tx in txs %}
+            {% for tx in block_txs['txs'] %}
             <tr>
                 <td>{{ loop.index }}</td>
                 <td><a href="/tx/{{tx['txid']}}">{{tx['txid']}}</a></td>
@@ -48,6 +49,7 @@
                 <td>{{ tx['size'] }}</td>
                 <td>{{ tx['weight'] }}</td>
                 <td>{{ tx['vin'][0]['is_coinbase'] }}</td>
+                <td>{{ tx['is_sgw']}}</td>
             </tr>
             {% endfor %}
         </tbody>

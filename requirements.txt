@@ -1,3 +1,4 @@
 quart
 aiohttp
 pytest-asyncio
+asyncstdlib

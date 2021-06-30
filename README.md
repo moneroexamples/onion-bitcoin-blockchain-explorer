@@ -65,10 +65,10 @@ Run it for development with:
 ```
 env QUART_APP=app quart run
 ```
-or for production with:
+or for production with 2 workers:
 
 ```
-hypercorn app
+hypercorn app -w 2
 ```
 
 ## Other monero examples

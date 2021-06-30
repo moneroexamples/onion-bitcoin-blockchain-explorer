@@ -1,6 +1,8 @@
 import asyncio
+import logging
+import random
 
-from .utils import isint
+from .utils.utils import isint
 
 from datetime import datetime
 from time import time
@@ -8,10 +10,10 @@ from quart import Quart, render_template
 
 from .fetch_blockchain_data import BlockchainFetch
 
-
-
 app = Quart(__name__)
 app.jinja_options = {}
+
+app.logger.level = logging.INFO
 
 # load config.py
 app.config.from_object('config')
@@ -27,35 +29,77 @@ BlockchainFetch.node_rpcpassword = app.config['BTC_NODE_RPC_PASSWORD']
 
 BLOCKS_ON_INDEX = app.config['BLOCKS_ON_INDEX']
 
+fetch = BlockchainFetch()
+
+
+@app.before_serving
+async def init():
+    app.logger.info("Initializing BlockchainFetch")
+    await fetch.init()
+
+
+async def update_block_list():
+    '''
+    This runs periodically in the event loop
+    to keep the list of the most recent blocks
+    up to date in our lru cache
+
+    :return: None
+    '''
+
+    while True:
+        app.logger.info("Refreshing block cache")
+
+        recent_blocks = await fetch.recent_blocks(BLOCKS_ON_INDEX)
+
+        # just start tx block scans. we do not await for the results as
+        # we do not need them here. This is just so that we start
+        # populating our block cache
+        #[asyncio.create_task(fetch.block_txs(block['id']))
+        #    for block in recent_blocks]
+        asyncio.gather(
+            *[fetch.block_txs(block['id']) for block in recent_blocks]
+        )
+
+        # sleep from some time before next refresh
+        # add some random time so that if you run it in multiple
+        # workers, they don't hit our indexer at the same time
+        await asyncio.sleep(120 + random.randint(-20, 20))
+
+
+@app.before_serving
+async def run_loop():
+    current_loop = asyncio.get_running_loop()
+    asyncio.ensure_future(update_block_list(), loop=current_loop)
+
+
+@app.after_serving
+async def close():
+    await fetch.close()
+
 
 @app.route('/')
 async def index():
 
-    recent_blocks = []
+    recent_blocks = await fetch.recent_blocks(BLOCKS_ON_INDEX)
 
-    async with BlockchainFetch() as fetch:
+    txs_in_blocks_fut = asyncio.gather(
+        *[fetch.block_txs(block['id']) for block in recent_blocks]
+    )
 
-        recent_blocks = await fetch.recent_blocks(BLOCKS_ON_INDEX)
-
-        txs_in_blocks_fut = asyncio.gather(
-            *[fetch.block_txs(block['id']) for block in recent_blocks]
-        )
-
-        btc_chain_status = await fetch.blockchain_info()
-        fee_estimate = await fetch.fee_estimate()
-        mempool = await fetch.mempool()
-
-        txs_in_blocks = (await txs_in_blocks_fut)
-
-        for i, block in enumerate(recent_blocks):
-            block['total_value'] = sum(tx['total_value'] for tx in txs_in_blocks[i])
-            block['total_fee'] = sum(tx['fee'] for tx in txs_in_blocks[i])
-
-        #print(txs_in_blocks)
+    btc_chain_status = await fetch.blockchain_info()
+    fee_estimate = await fetch.fee_estimate()
+    mempool = await fetch.mempool()
 
     if not recent_blocks:
         return await render_template(
             "error.html")
+
+    txs_in_blocks = await txs_in_blocks_fut
+
+    # TODO: eliminate this loop
+    for block, txs in zip(recent_blocks, txs_in_blocks):
+        block.update(txs)
 
     return await render_template(
         "index.html",
@@ -68,49 +112,45 @@ async def index():
 @app.route('/block/<block_id>')
 async def block(block_id):
 
-    async with BlockchainFetch() as fetch:
+    if len(block_id) == 64:
+        a_block = await fetch.block_by_id(block_id)
+    else:
+        if not isint(block_id):
+            app.logger.warning(f"Wrong block_id: {block_id}")
+            return await render_template(
+                "error.html",
+                msg=f"Wrong block_id: {block_id}")
 
-        if len(block_id) == 64:
-            a_block = await fetch.block_by_id(block_id)
-        else:
-            if not isint(block_id):
-                app.logger.warning(f"Wrong block_id: {block_id}")
-                return await render_template(
-                    "error.html",
-                    msg=f"Wrong block_id: {block_id}")
+        current_height = await fetch.current_height()
+        searched_height = int(block_id)
 
-            current_height = await fetch.current_height()
-            searched_height = int(block_id)
+        if (searched_height > current_height
+                or searched_height < 0):
+            app.logger.warning(f'Wrong block_id: {block_id}')
+            return await render_template(
+                "error.html",
+                msg=f"Wrong block_id: {block_id}")
 
-            if (searched_height > current_height
-                    or searched_height < 0):
-                app.logger.warning(f'Wrong block_id: {block_id}')
-                return await render_template(
-                    "error.html",
-                    msg=f"Wrong block_id: {block_id}")
+        block_id = await fetch.block_by_height(searched_height)
+        a_block = await fetch.block_by_id(block_id)
 
-            block_id = await fetch.block_by_height(searched_height)
-            a_block = await fetch.block_by_id(block_id)
-
-        block_txs = await fetch.block_txs(block_id)
+    block_txs = await fetch.block_txs(block_id)
 
     return await render_template(
         "block.html",
         block=await a_block.json(),
-        txs=block_txs)
+        block_txs=block_txs)
 
 
 @app.route('/tx/<tx_id>')
 async def tx(tx_id):
 
-    async with BlockchainFetch() as fetch:
+    if len(tx_id) != 64:
+        return await render_template(
+            "error.html",
+            msg=f"Wrong tx_id: {tx_id}")
 
-        if len(tx_id) != 64:
-            return await render_template(
-                "error.html",
-                msg=f"Wrong tx_id: {tx_id}")
-
-        tx_status = await fetch.tx_status(tx_id)
+    tx_status = await fetch.tx_status(tx_id)
 
     tx_status_text = await tx_status.text()
 
@@ -138,6 +178,7 @@ def timedelta(timestamp):
 
 
 import werkzeug.exceptions
+
 
 @app.errorhandler(werkzeug.exceptions.NotFound)
 async def handle_not_found(e):

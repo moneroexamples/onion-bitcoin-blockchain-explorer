@@ -3,7 +3,7 @@ import logging
 
 import aiohttp
 
-
+import asyncstdlib
 
 class BlockchainFetch:
 
@@ -22,16 +22,12 @@ class BlockchainFetch:
         self._node_url = (f"{BlockchainFetch.node_protocol}://{BlockchainFetch.node_rpcuser}:{BlockchainFetch.node_rpcpassword}"
                           + f"@{BlockchainFetch.node_host}:{BlockchainFetch.node_port}")
 
-    async def __aenter__(self):
+    async def init(self):
         self.session = aiohttp.ClientSession()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if exc_type:
-            logging.error(str(exc_val))
-
+    async def close(self):
         await self.session.close()
-        return True
 
     async def _get(self, url):
         return await self.session.get(
@@ -88,6 +84,7 @@ class BlockchainFetch:
                    "params": []}
         return await self._node_post(payload)
 
+    @asyncstdlib.lru_cache(maxsize=128)
     async def block_by_id(self, block_id):
         return await self._get(f'/block/{block_id}')
 
@@ -103,6 +100,7 @@ class BlockchainFetch:
     async def tx_status(self, tx_id):
         return await self._get(f'/tx/{tx_id}')
 
+    @asyncstdlib.lru_cache(maxsize=128)
     async def block_txs(self, block_id):
 
         block_txs_ids = await(
@@ -120,9 +118,18 @@ class BlockchainFetch:
         for tx in block_txs:
             vin_total = sum([vi.get("value", 0) for vi in tx.get("vin", [])])
             vout_total = sum([vo.get("value", 0) for vo in tx.get("vout", [])])
-            #print(tx['txid'], vin_total, vout_total, [vi.get("vout", 0) for vi in tx.get("vin", [])])
             tx["total_value"] = vout_total - vin_total
+            tx["is_sgw"] = 'witness' in tx['vin'][-1]
 
-        return block_txs
+        # tx summary in the block
+        summary = {
+            "txs": block_txs,
+            'total_value': sum(tx['total_value'] for tx in block_txs),
+            'total_fee': sum(tx['fee'] for tx in block_txs),
+            'sgw_percent':  (sum(tx['is_sgw'] for tx in block_txs)
+                                    / len(block_txs)) * 100.0
+        }
+
+        return summary
 
 
