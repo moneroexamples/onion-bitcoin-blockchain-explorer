@@ -35,14 +35,23 @@ async def index():
 
     async with BlockchainFetch() as fetch:
 
-        recent_blocks_future = asyncio.create_task(
-            fetch.recent_blocks(BLOCKS_ON_INDEX))
+        recent_blocks = await fetch.recent_blocks(BLOCKS_ON_INDEX)
+
+        txs_in_blocks_fut = asyncio.gather(
+            *[fetch.block_txs(block['id']) for block in recent_blocks]
+        )
 
         btc_chain_status = await fetch.blockchain_info()
         fee_estimate = await fetch.fee_estimate()
         mempool = await fetch.mempool()
 
-        recent_blocks = await recent_blocks_future
+        txs_in_blocks = (await txs_in_blocks_fut)
+
+        for i, block in enumerate(recent_blocks):
+            block['total_value'] = sum(tx['total_value'] for tx in txs_in_blocks[i])
+            block['total_fee'] = sum(tx['fee'] for tx in txs_in_blocks[i])
+
+        #print(txs_in_blocks)
 
     if not recent_blocks:
         return await render_template(
@@ -89,6 +98,7 @@ async def block(block_id):
         "block.html",
         block=await a_block.json(),
         txs=block_txs)
+
 
 @app.route('/tx/<tx_id>')
 async def tx(tx_id):

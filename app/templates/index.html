@@ -16,13 +16,14 @@
 
  <h3>Recent blocks</h3>
  <div class="center">
-
     <table class="center">
         <tr>
             <td>height</td>
             <td>age [h:m]</td>
             <td>size [kB]</td>
             <td>{{"tx_count"}}</td>
+            <td>Value [BTC]</td>
+            <td>Fee [BTC]</td>
         </tr>
     {% for block in recent_blocks %}
         <tr>
@@ -30,10 +31,10 @@
             <td>{{block['timestamp'] | timedelta }}</td>
             <td>{{(block['size'] / 1024) | round(0)}}</td>
             <td>{{block['tx_count']}}</td>
+            <td>{{ (block['total_value'] / 1e8) | round(7)}}</td>
+            <td>{{ (block['total_fee'] / 1e8) | round(7)}}</td>
         </tr>
     {% endfor %}
     </table>
  </div>
 {% endblock %}
-
-
