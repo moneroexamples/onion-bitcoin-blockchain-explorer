@@ -46,7 +46,12 @@ Once built, run with:
 ./target/release/electrs -vvv --network testnet --timestamp --http-addr "127.0.0.1:3000"
 ```
 
+once started have to wait till its fully synced with the node.
+
 ### Onion Bitcoin blockchain explorer
+
+Before the explorer can be used, the indexer must be fully synced with
+the node.
 
 ```
 git clone https://github.com/moneroexamples/onion-bitcoin-blockchain-explorer.git
