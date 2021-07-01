@@ -159,9 +159,33 @@ async def tx(tx_id):
             "error.html",
             msg=f"Transaction {tx_id} not found")
 
+    print(await tx_status.json())
+
     return await render_template(
         "transaction.html",
         tx=await tx_status.json())
+
+
+@app.route('/address/<address>')
+async def address(address):
+
+    # if len(address) != 64:
+    #     return await render_template(
+    #         "error.html",
+    #         msg=f"Wrong address: {address}")
+
+    address_info = await fetch.address(address)
+
+    address_info_text = await address_info.text()
+
+    # if "Transaction not found" in address_info_text:
+    #     return await render_template(
+    #         "error.html",
+    #         msg=f"Address {address} not found")
+
+    return await render_template(
+        "address.html",
+        address=await address_info.json())
 
 
 @app.template_filter()

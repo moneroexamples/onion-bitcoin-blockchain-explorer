@@ -14,7 +14,7 @@
             <td>Δ [h:m:s]:</td><td>{{delta_time}}</td>
         </tr>
         <tr>
-            <td>Version:</td><td>block['version']</td>
+            <td>Version:</td><td>{{ block['version'] }} </td>
             <td>Block reward:</td><td>{{blk_reward}}</td>
             <td>Block size [kB]:</td><td>{{(block['size'] / 1024) | round(2)}}</td>
         </tr>
@@ -36,6 +36,7 @@
                 <td>fee [mBTC]</td>
                 <td>value [BTC]</td>
                 <td>size [byte]</td>
+                <td>in/out</td>
                 <td>weight</td>
                 <td>coinbase</td>
                 <td>segwit</td>
@@ -47,6 +48,7 @@
                 <td>{{ (tx['fee'] / 1e5) | round(7)}}</td>
                 <td>{{ (tx['total_value'] / 1e8) | round(7)}}</td>
                 <td>{{ tx['size'] }}</td>
+                <td>{{ tx['vin'] | length }}/{{ tx['vout'] | length }}</td>
                 <td>{{ tx['weight'] }}</td>
                 <td>{{ tx['vin'][0]['is_coinbase'] }}</td>
                 <td>{{ tx['is_sgw']}}</td>
