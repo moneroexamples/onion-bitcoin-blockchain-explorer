@@ -5,12 +5,13 @@ import random
 from .utils.utils import isint
 
 from datetime import datetime
-from time import time
+
 from quart import Quart, render_template
 
 from .fetch_blockchain_data import BlockchainFetch
 
 app = Quart(__name__)
+
 app.jinja_options = {}
 
 app.logger.level = logging.INFO
@@ -152,14 +153,10 @@ async def tx(tx_id):
 
     tx_status = await fetch.tx_status(tx_id)
 
-    tx_status_text = await tx_status.text()
-
-    if "Transaction not found" in tx_status_text:
+    if tx_status.status != 200:
         return await render_template(
             "error.html",
             msg=f"Transaction {tx_id} not found")
-
-    print(await tx_status.json())
 
     return await render_template(
         "transaction.html",
@@ -169,23 +166,27 @@ async def tx(tx_id):
 @app.route('/address/<address>')
 async def address(address):
 
-    # if len(address) != 64:
-    #     return await render_template(
-    #         "error.html",
-    #         msg=f"Wrong address: {address}")
+    if len(address) not in [34, 35, 42]:
+        return await render_template(
+            "error.html",
+            msg=f"Wrong address: {address}")
+
+    address_txs_task = asyncio.create_task(
+        fetch.address_txs(address))
 
     address_info = await fetch.address(address)
 
-    address_info_text = await address_info.text()
+    if address_info.status != 200:
+        return await render_template(
+            "error.html",
+            msg=f"Invalid or not found {address}")
 
-    # if "Transaction not found" in address_info_text:
-    #     return await render_template(
-    #         "error.html",
-    #         msg=f"Address {address} not found")
+    address_txs = await address_txs_task
 
     return await render_template(
         "address.html",
-        address=await address_info.json())
+        address=await address_info.json(),
+        txs=await address_txs.json())
 
 
 @app.template_filter()

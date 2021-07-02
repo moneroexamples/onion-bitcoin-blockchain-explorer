@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<h3 style="font-size: 12px; margin-top: 5px; margin-bottom: 3">
+<h5 style="margin-top: 5px; margin-bottom: 3">
     Chain: {{info['chain']}} |
     Difficulty: {{info['difficulty'] | round(0)}} |
     Median time: {{info['mediantime']}} |
@@ -12,7 +12,7 @@
     Txs in mempool: {{mempool['count']}} |
     Size of mempool: {{mempool['vsize']}} |
     Total fees in mempool: {{mempool['total_fee']}}
-</h3>
+</h5>
 
  <h3>Recent blocks</h3>
  <div class="center">

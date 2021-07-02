@@ -3,13 +3,60 @@
 
 {% block content %}
 
-<H4>Address: {{address['address']}}</H4>
+<H3>Address: {{address['address']}}</H3>
+<H4>Balance: {{((address['chain_stats']['funded_txo_sum']-address['chain_stats']['spent_txo_sum']) / 1e8) | round(7)}} BTC</H4>
 
- <div class="center">
-{{address | tojson }}
- </div>
+    <table class="center">
+        <tr>
+            <td>Txs count:</td><td>{{address['chain_stats']['tx_count']}}</td>
+            <td>Received/spent [BTC]:</td>
+              <td>
+                {{(address['chain_stats']['funded_txo_sum'] / 1e8) | round(7)}} /
+                {{(address['chain_stats']['spent_txo_sum'] / 1e8) | round(7)}}
+              </td>
+            <td>Received/spent count:</td>
+              <td>
+                {{(address['chain_stats']['funded_txo_count'] ) }} /
+                {{(address['chain_stats']['spent_txo_count'] ) }}
+              </td>
 
-</div>
+        </tr>
+        <tr>
+            <td>Mempool Txs count:</td><td>{{address['mempool_stats']['tx_count']}}</td>
+            <td>Mempool received/spent [BTC]:</td>
+              <td>
+                {{(address['mempool_stats']['funded_txo_sum'] / 1e8) | round(7)}} /
+                {{(address['mempool_stats']['spent_txo_sum'] / 1e8) | round(7)}}
+              </td>
+            <td>Mempool received/spent count:</td>
+              <td>
+                {{(address['mempool_stats']['funded_txo_count'] ) }} /
+                {{(address['mempool_stats']['spent_txo_count'] ) }}
+              </td>
+
+        </tr>
+
+
+    </table>
+
+
+<h3>Recent txs (up to last 25)</h3>
+
+{% import '_macros.html' as macros %}
+
+{% for tx in txs %}
+    <div class="center">
+         <h4>
+             {{ loop.index }}: Tx hash: {{tx['txid']}},
+             Block: {{tx['status']['block_height']}},
+             Timestamp: {{tx['status']['block_time']}}
+             Age: {{tx['status']['block_time'] | timedelta}}
+         </h4>
+         {{ macros.tx_vin_vout(tx) }}
+     </div>
+{% endfor %}
+
+
 
 {% endblock %}
 

@@ -1,0 +1,48 @@
+{% macro tx_vin_vout(tx) -%}
+    <h3>Inputs</h3>
+         <table class="center" style="width:80%">
+            <tbody>
+            <tr>
+                <td>no.</td>
+                <td style="min-width:400px;">from address</td>
+                <td>value</td>
+                <td style="min-width:600px;">from tx</td>
+            </tr>
+            {% for vin in tx['vin'] %}
+            <tr>
+                <td>{{ loop.index }}</td>
+
+                {% if vin['prevout'] != None  %}
+                   <td><a href="/address/{{vin['prevout']['scriptpubkey_address']}}">{{vin['prevout']['scriptpubkey_address']}}</a></td>
+                   <td>{{ (vin['prevout']['value'] / 1e8) | round(7)}}</td>
+                    <td><a href="/tx/{{vin['txid']}}">{{vin['txid']}}</a></td>
+                {% else %}
+                    <td>Coinbase</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+     <h3>Outputs</h3>
+         <table class="center" style="width:80%">
+            <tbody>
+            <tr>
+                <td>no.</td>
+                <td style="min-width:400px;">to address</td>
+                <td>value</td>
+                <td style="min-width:600px;">from tx</td>
+            </tr>
+            {% for vout in tx['vout'] %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="/address/{{vout['scriptpubkey_address']}}">{{vout['scriptpubkey_address']}}</a></td>
+                <td>{{ (vout['value'] / 1e8) | round(7)}}</td>
+                <td>N/A</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{%- endmacro %}
