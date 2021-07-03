@@ -109,6 +109,9 @@ class BlockchainFetch:
     async def mempool_recent(self):
         return await self._get(f'/mempool/recent')
 
+    async def mempool_txids(self):
+        return await self._get(f'/mempool/txids')
+
     @asyncstdlib.lru_cache(maxsize=128)
     async def block_txs(self, block_id):
 

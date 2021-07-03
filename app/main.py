@@ -88,11 +88,15 @@ async def index():
         *[fetch.block_txs(block['id']) for block in recent_blocks]
     )
 
+    btc_chain_status = await fetch.blockchain_info()
+
     mempool_recent_task = asyncio.create_task(fetch.mempool_recent())
 
-    btc_chain_status = await fetch.blockchain_info()
     fee_estimate = await fetch.fee_estimate()
     mempool = await fetch.mempool()
+    #mempool_txids = await fetch.mempool_txids()
+
+    #print(await mempool_txids.json())
 
     if not recent_blocks:
         return await render_template(
