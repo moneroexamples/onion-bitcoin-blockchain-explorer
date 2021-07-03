@@ -106,6 +106,9 @@ class BlockchainFetch:
     async def address_txs(self, address, last_seen_txid=None):
         return await self._get(f'/address/{address}/txs/chain')
 
+    async def mempool_recent(self):
+        return await self._get(f'/mempool/recent')
+
     @asyncstdlib.lru_cache(maxsize=128)
     async def block_txs(self, block_id):
 

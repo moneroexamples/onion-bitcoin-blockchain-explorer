@@ -8,11 +8,37 @@
     Difficulty: {{info['difficulty'] | round(0)}} |
     Median time: {{info['mediantime']}} |
     Size on Disk: {{info['size_on_disk']}} |
-    Next block fee: {{fee_estimate['1']}}  <br/>
-    Txs in mempool: {{mempool['count']}} |
-    Size of mempool: {{mempool['vsize']}} |
-    Total fees in mempool: {{mempool['total_fee']}}
+    Next block fee: {{fee_estimate['1']}}
 </h5>
+
+
+ <h3 style="margin-bottom:0">10 recent mempool transactions</h3>
+<h5 style="margin-top: 5px; margin-bottom: 10px">
+    (Total count of txs: {{mempool['count']}} |
+    Total size [byte]: {{mempool['vsize']}} |
+    Total fees [BTC]: {{ (mempool['total_fee'] / 1e8) | round(7) }})
+</h5>
+<div class="center">
+    <table class="center" style="width:60%">
+        <tr>
+            <td>no.</td>
+            <td>tx hash</td>
+            <td>fee [mBTC]</td>
+            <td>value [BTC]</td>
+            <td>size [byte]</td>
+        </tr>
+    {% for mtx in mempool_recent %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td><a href="/tx/{{mtx['txid']}}">{{mtx['txid']}}</a></td>
+            <td>{{ (mtx['fee'] / 1e5) | round(7)}}</td>
+            <td>{{ (mtx['value'] / 1e8) | round(7)}}</td>
+            <td>{{ mtx['vsize'] }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+
 
  <h3>Recent blocks</h3>
  <div class="center">

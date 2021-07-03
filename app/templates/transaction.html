@@ -8,8 +8,13 @@
     <table class="center">
         <tr>
             <td>Timestamp [UCT]:</td><td>{{tx['status']['block_time']}}</td>
-            <td>Age {{age_format}}:</td><td>{{tx['status']['block_time'] | timedelta}}</td>
-            <td>Block</td><td>{{tx['status']['block_height']}}</td>
+             {% if 'block_time' in tx['status']  %}
+                <td>Age:</td><td>{{tx['status']['block_time'] | timedelta}}</td>
+                <td>Block</td><td>{{tx['status']['block_height']}}</td>
+             {% else %}
+                <td>Age:</td><td>N/A</td>
+                <td>Block</td><td>N/A</td>
+             {% endif %}
         </tr>
         <tr>
             <td>Version:</td><td>{{ tx['version'] }} </td>

@@ -88,6 +88,8 @@ async def index():
         *[fetch.block_txs(block['id']) for block in recent_blocks]
     )
 
+    mempool_recent_task = asyncio.create_task(fetch.mempool_recent())
+
     btc_chain_status = await fetch.blockchain_info()
     fee_estimate = await fetch.fee_estimate()
     mempool = await fetch.mempool()
@@ -98,6 +100,8 @@ async def index():
 
     txs_in_blocks = await txs_in_blocks_fut
 
+    mempool_recent = await mempool_recent_task
+
     # TODO: eliminate this loop
     for block, txs in zip(recent_blocks, txs_in_blocks):
         block.update(txs)
@@ -107,6 +111,7 @@ async def index():
         info=(await btc_chain_status.json())['result'],
         recent_blocks=recent_blocks,
         fee_estimate=fee_estimate,
+        mempool_recent=await mempool_recent.json(),
         mempool=mempool)
 
 
