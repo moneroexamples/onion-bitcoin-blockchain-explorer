@@ -51,10 +51,11 @@ a:active {
     color: white;
 }
 
+/*
 form {
     display: inline-block;
     text-align: center;
-}
+}*/
 
 .style-1 input[type="text"] {
     padding: 2px;
@@ -90,6 +91,10 @@ form {
 
 .tab [type=radio] {
     display: none;
+}
+
+ tr:hover {
+   background-color: #333333;
 }
 
 .content {

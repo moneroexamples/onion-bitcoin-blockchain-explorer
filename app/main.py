@@ -6,7 +6,7 @@ from .utils.utils import isint
 
 from datetime import datetime
 
-from quart import Quart, render_template
+from quart import Quart, render_template, request, redirect
 
 from .fetch_blockchain_data import BlockchainFetch
 
@@ -197,6 +197,45 @@ async def address(address):
         address=await address_info.json(),
         txs=await address_txs.json())
 
+@app.route('/search')
+async def search():
+
+    value = request.args.get('value', None)
+
+    if not value:
+        return await render_template(
+            "error.html",
+            msg=f"No search value provided")
+
+    value = value.strip()
+
+    # first check if we search for an address
+    address_info = await fetch.address(value)
+
+    if address_info.status == 200:
+        return redirect(f'/address/{value}')
+
+    # next check if we search for a transaction
+    tx_status = await fetch.tx_status(value)
+
+    if tx_status.status == 200:
+        return redirect(f'/tx/{value}')
+
+    # finally check for block
+    a_block = await fetch.block_by_id(value)
+
+    if a_block.status == 200:
+        return redirect(f'/block/{value}')
+
+    block_id = await fetch.block_by_height(value)
+
+    if "not found" not in block_id:
+        return redirect(f'/block/{block_id}')
+
+    return await render_template(
+        "error.html",
+        msg=f"Can't find {value}")
+
 
 @app.template_filter()
 def timedelta(timestamp):
@@ -217,3 +256,9 @@ import werkzeug.exceptions
 @app.errorhandler(werkzeug.exceptions.NotFound)
 async def handle_not_found(e):
     return await render_template("error.html"), 404
+
+
+@app.errorhandler(Exception)
+async def server_error(err):
+    app.logger.error(str(err))
+    return await render_template('error.html'), 500

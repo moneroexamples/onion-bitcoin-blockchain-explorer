@@ -12,15 +12,22 @@
     Next block fee: {{fee_estimate['1']}}
 </h5>
 
+<div class="center" style="text-align: center">
+    <form action="/search" method="get" style="width:80%; display: inline-block" class="center" >
+        <input type="text" name="value" size="80" placeholder="block height, block hash, transaction hash, address">
+        <input type="submit" value="Search">
+    </form>
+</div>
 
- <h3 style="margin-bottom:0">10 recent mempool transactions</h3>
+
+<h2 style="margin-bottom:0">10 recent mempool transactions</h2>
 <h5 style="margin-top: 5px; margin-bottom: 10px">
     (Total count of txs: {{mempool['count']}} |
     Total size [byte]: {{mempool['vsize']}} |
     Total fees [BTC]: {{ (mempool['total_fee'] / 1e8) | round(7) }})
 </h5>
 <div class="center">
-    <table class="center" style="width:60%">
+    <table class="center" style="width:70%">
         <tr>
             <td>no.</td>
             <td>tx hash</td>
@@ -41,7 +48,7 @@
 </div>
 
 
- <h3>Recent blocks</h3>
+ <h2>Recent blocks</h2>
  <div class="center">
     <table class="center">
         <tr>
