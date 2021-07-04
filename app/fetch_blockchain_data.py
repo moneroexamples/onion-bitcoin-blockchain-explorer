@@ -112,6 +112,16 @@ class BlockchainFetch:
     async def mempool_txids(self):
         return await self._get(f'/mempool/txids')
 
+    async def mempool_txs_from_node(self, verbose=False):
+        payload = {"method": "getrawmempool",
+                   "params": [verbose]}
+        return await self._node_post(payload)
+
+    async def chain_tx_stats(self, nblocks=144):
+        payload = {"method": "getchaintxstats",
+                   "params": [nblocks]}
+        return await self._node_post(payload)
+
     @asyncstdlib.lru_cache(maxsize=128)
     async def block_txs(self, block_id):
 

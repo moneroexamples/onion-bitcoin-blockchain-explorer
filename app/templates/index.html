@@ -3,13 +3,17 @@
 
 {% block content %}
 
-<h5 style="margin-top: 5px; margin-bottom: 3">
+<h5 style="margin-top: 5px; margin-bottom: 3px">
     Chain: {{ info['chain'] }} |
     Difficulty: {{ info['difficulty'] | round(0)}} |
     Headers: {{ info['headers'] }} |
     Median time: {{info['mediantime']}} |
     Size on disk [GB]: {{ (info['size_on_disk'] / 1e6) | round(0) }} |
     Next block fee: {{fee_estimate['1']}}
+</h5>
+<h5 style="margin-top: 0px; margin-bottom: 20px">
+    Total txs count: {{ txs_stats['txcount'] }} |
+    Txs per second over last 24h: {{ txs_stats['txrate'] | round(2)}}
 </h5>
 
 <div class="center" style="text-align: center">

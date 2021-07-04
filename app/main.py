@@ -98,6 +98,11 @@ async def index():
 
     #print(await mempool_txids.json())
 
+    # mempool_from_node = await fetch.mempool_txs_from_node(True)
+    # print(await mempool_from_node.text())
+
+    chain_tx_stats = await fetch.chain_tx_stats()
+
     if not recent_blocks:
         return await render_template(
             "error.html")
@@ -116,6 +121,7 @@ async def index():
         recent_blocks=recent_blocks,
         fee_estimate=fee_estimate,
         mempool_recent=await mempool_recent.json(),
+        txs_stats=(await chain_tx_stats.json())['result'],
         mempool=mempool)
 
 
