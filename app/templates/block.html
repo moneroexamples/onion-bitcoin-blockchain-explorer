@@ -19,7 +19,7 @@
             <td>Block size [kB]:</td><td>{{(block['size'] / 1024) | round(2)}}</td>
         </tr>
         <tr>
-            <td>nonce:</td><td>{{block['nonce']}}</td>
+            <td>Nonce:</td><td>{{block['nonce']}}</td>
             <td>Total fees:</td><td>{{sum_fees}}</td>
             <td>No of txs:</td><td>{{block['tx_count']}}</td>
         </tr>
@@ -32,14 +32,14 @@
             <tbody>
             <tr>
                 <td>No.</td>
-                <td>tx hash</td>
-                <td>fee [mBTC]</td>
-                <td>value [BTC]</td>
-                <td>size [byte]</td>
-                <td>in/out</td>
-                <td>weight</td>
-                <td>coinbase</td>
-                <td>segwit</td>
+                <td>Tx hash</td>
+                <td>Fee [mBTC]</td>
+                <td>Value [BTC]</td>
+                <td>Size [byte]</td>
+                <td>In/out</td>
+                <td>Weight</td>
+                <td>Coinbase</td>
+                <td>Segwit</td>
             </tr>
             {% for tx in block_txs['txs'] %}
             <tr>
