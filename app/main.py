@@ -68,10 +68,33 @@ async def update_block_list():
         await asyncio.sleep(120 + random.randint(-20, 20))
 
 
+async def get_current_mempool_txs():
+    '''
+    This runs periodically in the event loop
+    to keep the list of the most recent blocks
+    up to date in our lru cache
+
+    :return: None
+    '''
+
+    while True:
+        app.logger.info("Getting mempool txs")
+
+        mempool_txs = await fetch.mempool_txs_from_node(True)
+
+        print(await mempool_txs.json())
+
+        # sleep from some time before next refresh
+        # add some random time so that if you run it in multiple
+        # workers, they don't hit our indexer at the same time
+        await asyncio.sleep(110 + random.randint(-2, 2))
+
+
 @app.before_serving
 async def run_loop():
     current_loop = asyncio.get_running_loop()
     asyncio.ensure_future(update_block_list(), loop=current_loop)
+    asyncio.ensure_future(get_current_mempool_txs(), loop=current_loop)
 
 
 @app.after_serving

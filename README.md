@@ -3,6 +3,10 @@
 The explorer is implemented as an `asyncio` application 
 in Python +3.7 with `Quart` and `aiohttp`.
 
+### Screenshot
+
+![Bitcoin Onion Explorer](screenshot/index.png?raw=true "Bitcoin Onion Explorer")
+
 ### TO DO
 
 Still lots of things to do, as this is the **very early stage** of the development. But 
