@@ -12,6 +12,10 @@ in Python +3.7 with `Quart` and `aiohttp`.
 Still lots of things to do, as this is the **very early stage** of the development. But 
 issues, comments and testing is already being welcomed. 
 
+### Screenshot
+
+![Bitcoin Onion Explorer](screenshot/index.png?raw=true "Bitcoin Onion Explorer")
+
 ### Testnet btc node
 
 Install Bitcoin Core and run `bitcoind` in the testnet mode with some rpcuser and rpcpassword
