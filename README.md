@@ -50,7 +50,8 @@ Once built, run with:
 ./target/release/electrs -vvv --network testnet --timestamp --http-addr "127.0.0.1:3000"
 ```
 
-once started have to wait till its fully synced with the node.
+once started have to wait till its **fully synced** with the node. The index will not accept
+any connections if its not in sync with the blockchain.
 
 ### Onion Bitcoin blockchain explorer
 
